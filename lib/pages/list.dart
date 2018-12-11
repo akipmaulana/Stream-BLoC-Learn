@@ -10,7 +10,6 @@ import 'package:movies_streams/pages/filters.dart';
 import 'package:movies_streams/widgets/favorite_button.dart';
 import 'package:movies_streams/widgets/filters_summary.dart';
 import 'package:movies_streams/widgets/movie_card_widget.dart';
-import 'package:movies_streams/api/tmdb_api.dart';
 
 class ListPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -20,8 +19,6 @@ class ListPage extends StatelessWidget {
     final MovieCatalogBloc movieBloc =
         BlocProvider.of<MovieCatalogBloc>(context);
     final FavoriteBloc favoriteBloc = BlocProvider.of<FavoriteBloc>(context);
-
-    // _listenException(movieBloc);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -35,15 +32,12 @@ class ListPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.more_horiz),
             onPressed: () {
-              //_scaffoldKey.currentState.openEndDrawer();
-              print("Throw exception");
-              movieBloc.inMovieException
-                  .add(MovieException(code: 12, cause: "asdder"));
+              _scaffoldKey.currentState.openEndDrawer();
             },
           ),
         ],
       ),
-      body: LayoutBuilder(builder: (ctx, cs) {
+      body: LayoutBuilder(builder: (context, constraint) {
         _listenException(movieBloc);
         return _buildContent(movieBloc, favoriteBloc);
       }),
@@ -52,39 +46,13 @@ class ListPage extends StatelessWidget {
   }
 
   Widget _listenException(MovieCatalogBloc movieBloc) {
-    /* StreamBuilder<MovieException>(
-      stream: movieBloc.outMovieException,
-      builder: (BuildContext context, AsyncSnapshot<MovieException> snapshot) {
-        /* Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text("asdasd"),
-          backgroundColor: Colors.redAccent,
-        ));*/
-        print("Run here!");
-
-        if (snapshot.hasData) {
-          SnackBar snackBar = new SnackBar(
-            content: new Text("asdasd"),
-            backgroundColor: Colors.redAccent,
-          );
-          _scaffoldKey.currentState.showSnackBar(snackBar);
-        }
-        // return _buildContent(movieBloc, favoriteBloc);
-      },
-    );*/
-
     movieBloc.outMovieException.listen((data) {
-      print("Listener working");
       SnackBar snackBar = new SnackBar(
-        content: new Text("asdasd"),
+        content: new Text(data.toString()),
         backgroundColor: Colors.redAccent,
       );
       _scaffoldKey.currentState.showSnackBar(snackBar);
     });
-
-    /* StreamController<Stream<MovieException>> streamController = new StreamController();
-    streamController.stream.listen((d){
-      print("Listener working");
-    });*/
   }
 
   Widget _buildContent(MovieCatalogBloc movieBloc, FavoriteBloc favoriteBloc) {

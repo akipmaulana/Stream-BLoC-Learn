@@ -33,7 +33,7 @@ class TmdbApi {
       int genre: 28}) async {
     var uri = Uri.https(
       baseUrl,
-      '3/discovser/$type',
+      '3/discover/$type',
       <String, String>{
         'api_key': TMDB_API_KEY,
         'language': 'en-US',

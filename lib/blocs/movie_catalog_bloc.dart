@@ -50,7 +50,7 @@ class MovieCatalogBloc implements BlocBase {
 
   PublishSubject<MovieException> _exceptionController =
       PublishSubject<MovieException>();
-  Sink<MovieException> get inMovieException => _exceptionController.sink;
+  Sink<MovieException> get _inMovieException => _exceptionController.sink;
   Stream<MovieException> get outMovieException => _exceptionController.stream;
 
   ///
@@ -127,6 +127,7 @@ class MovieCatalogBloc implements BlocBase {
     _releaseDatesController.close();
     _genreController.close();
     _filtersController.close();
+    _exceptionController.close();
   }
 
   // ############# HANDLING  #####################
@@ -239,6 +240,6 @@ class MovieCatalogBloc implements BlocBase {
   }
 
   void _handleError(MovieException exception) {
-    inMovieException.add(exception);
+    _inMovieException.add(exception);
   }
 }

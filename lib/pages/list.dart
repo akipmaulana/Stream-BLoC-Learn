@@ -21,7 +21,7 @@ class ListPage extends StatelessWidget {
         BlocProvider.of<MovieCatalogBloc>(context);
     final FavoriteBloc favoriteBloc = BlocProvider.of<FavoriteBloc>(context);
 
-    _listenException(movieBloc);
+    // _listenException(movieBloc);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -43,7 +43,10 @@ class ListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: _buildContent(movieBloc, favoriteBloc),
+      body: LayoutBuilder(builder: (ctx, cs) {
+        _listenException(movieBloc);
+        return _buildContent(movieBloc, favoriteBloc);
+      }),
       endDrawer: FiltersPage(),
     );
   }

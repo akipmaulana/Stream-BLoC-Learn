@@ -9,6 +9,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   rxdart: ^0.18.1
   flutter_range_slider: ^0.0.4
+  http: ^0.12.0
   
 dev_dependencies:
   flutter_test:

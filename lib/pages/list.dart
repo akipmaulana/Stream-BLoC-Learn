@@ -10,6 +10,7 @@ import 'package:movies_streams/pages/filters.dart';
 import 'package:movies_streams/widgets/favorite_button.dart';
 import 'package:movies_streams/widgets/filters_summary.dart';
 import 'package:movies_streams/widgets/movie_card_widget.dart';
+import 'package:movies_streams/api/tmdb_api.dart';
 
 class ListPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -19,6 +20,8 @@ class ListPage extends StatelessWidget {
     final MovieCatalogBloc movieBloc =
         BlocProvider.of<MovieCatalogBloc>(context);
     final FavoriteBloc favoriteBloc = BlocProvider.of<FavoriteBloc>(context);
+
+    _listenException(movieBloc, context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -32,39 +35,56 @@ class ListPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.more_horiz),
             onPressed: () {
-              _scaffoldKey.currentState.openEndDrawer();
+              //_scaffoldKey.currentState.openEndDrawer();
+              movieBloc.inMovieException.add(MovieException(code: 12, cause: "asdder"));
             },
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          FiltersSummary(),
-          Expanded(
-            // Display an infinite GridView with the list of all movies in the catalog,
-            // that meet the filters
-            child: StreamBuilder<List<MovieCard>>(
-                stream: movieBloc.outMoviesList,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<MovieCard>> snapshot) {
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.0,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return _buildMovieCard(context, movieBloc, index,
-                          snapshot.data, favoriteBloc.outFavorites);
-                    },
-                    itemCount:
-                        (snapshot.data == null ? 0 : snapshot.data.length) + 30,
-                  );
-                }),
-          ),
-        ],
-      ),
+      body: _buildContent(movieBloc, favoriteBloc),
       endDrawer: FiltersPage(),
+    );
+  }
+
+  void _listenException(MovieCatalogBloc movieBloc, BuildContext ctx) {
+    StreamBuilder<MovieException>(
+      stream: movieBloc.outMovieException,
+      builder: (BuildContext context, AsyncSnapshot<MovieException> snapshot) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text("asdasd"),
+          backgroundColor: Colors.redAccent,
+        ));
+      },
+    );
+  }
+
+  Widget _buildContent(MovieCatalogBloc movieBloc, FavoriteBloc favoriteBloc) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        FiltersSummary(),
+        Expanded(
+          // Display an infinite GridView with the list of all movies in the catalog,
+          // that meet the filters
+          child: StreamBuilder<List<MovieCard>>(
+              stream: movieBloc.outMoviesList,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<MovieCard>> snapshot) {
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.0,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildMovieCard(context, movieBloc, index,
+                        snapshot.data, favoriteBloc.outFavorites);
+                  },
+                  itemCount:
+                  (snapshot.data == null ? 0 : snapshot.data.length) + 30,
+                );
+              }),
+        ),
+      ],
     );
   }
 

@@ -48,6 +48,11 @@ class MovieCatalogBloc implements BlocBase {
 
   // ##########  STREAMS  ##############
 
+  PublishSubject<MovieException> _exceptionController =
+      PublishSubject<MovieException>();
+  Sink<MovieException> get inMovieException => _exceptionController.sink;
+  Stream<MovieException> get outMovieException => _exceptionController.stream;
+
   ///
   /// We are going to need the list of movies to be displayed
   ///
@@ -154,7 +159,8 @@ class MovieCatalogBloc implements BlocBase {
                   minYear: _minReleaseDate,
                   maxYear: _maxReleaseDate)
               .then((MoviePageResult fetchedPage) =>
-                  _handleFetchedPage(fetchedPage, pageIndex));
+                  _handleFetchedPage(fetchedPage, pageIndex))
+              .catchError((err) => _handleError(err));
         }
       }
     });
@@ -230,5 +236,9 @@ class MovieCatalogBloc implements BlocBase {
 
     // we need to tell about a change so that we pick another list of movies
     _inMoviesList.add(<MovieCard>[]);
+  }
+
+  void _handleError(MovieException exception) {
+    inMovieException.add(exception);
   }
 }

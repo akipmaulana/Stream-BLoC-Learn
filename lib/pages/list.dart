@@ -21,7 +21,7 @@ class ListPage extends StatelessWidget {
         BlocProvider.of<MovieCatalogBloc>(context);
     final FavoriteBloc favoriteBloc = BlocProvider.of<FavoriteBloc>(context);
 
-    _listenException(movieBloc, context);
+    _listenException(movieBloc);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -36,7 +36,9 @@ class ListPage extends StatelessWidget {
             icon: const Icon(Icons.more_horiz),
             onPressed: () {
               //_scaffoldKey.currentState.openEndDrawer();
-              movieBloc.inMovieException.add(MovieException(code: 12, cause: "asdder"));
+              print("Throw exception");
+              movieBloc.inMovieException
+                  .add(MovieException(code: 12, cause: "asdder"));
             },
           ),
         ],
@@ -46,16 +48,40 @@ class ListPage extends StatelessWidget {
     );
   }
 
-  void _listenException(MovieCatalogBloc movieBloc, BuildContext ctx) {
-    StreamBuilder<MovieException>(
+  Widget _listenException(MovieCatalogBloc movieBloc) {
+    /* StreamBuilder<MovieException>(
       stream: movieBloc.outMovieException,
       builder: (BuildContext context, AsyncSnapshot<MovieException> snapshot) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
+        /* Scaffold.of(ctx).showSnackBar(new SnackBar(
           content: new Text("asdasd"),
           backgroundColor: Colors.redAccent,
-        ));
+        ));*/
+        print("Run here!");
+
+        if (snapshot.hasData) {
+          SnackBar snackBar = new SnackBar(
+            content: new Text("asdasd"),
+            backgroundColor: Colors.redAccent,
+          );
+          _scaffoldKey.currentState.showSnackBar(snackBar);
+        }
+        // return _buildContent(movieBloc, favoriteBloc);
       },
-    );
+    );*/
+
+    movieBloc.outMovieException.listen((data) {
+      print("Listener working");
+      SnackBar snackBar = new SnackBar(
+        content: new Text("asdasd"),
+        backgroundColor: Colors.redAccent,
+      );
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    });
+
+    /* StreamController<Stream<MovieException>> streamController = new StreamController();
+    streamController.stream.listen((d){
+      print("Listener working");
+    });*/
   }
 
   Widget _buildContent(MovieCatalogBloc movieBloc, FavoriteBloc favoriteBloc) {
@@ -80,7 +106,7 @@ class ListPage extends StatelessWidget {
                         snapshot.data, favoriteBloc.outFavorites);
                   },
                   itemCount:
-                  (snapshot.data == null ? 0 : snapshot.data.length) + 30,
+                      (snapshot.data == null ? 0 : snapshot.data.length) + 30,
                 );
               }),
         ),
@@ -114,8 +140,7 @@ class ListPage extends StatelessWidget {
         movieCard: movieCard,
         favoritesStream: favoritesStream,
         onPressed: () {
-          Navigator
-              .of(context)
+          Navigator.of(context)
               .push(MaterialPageRoute(builder: (BuildContext context) {
             return DetailsPage(
               data: movieCard,
